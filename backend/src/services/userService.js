@@ -2,6 +2,7 @@ import User from "../models/authUser.js";
 
 // Get data user berdasarkan ID
 export const getUserProfile = async (userId) => {
+  
   const user = await User.findById(userId).select("-password");
 
   if (!user) {

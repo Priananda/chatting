@@ -5,9 +5,9 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
 
-import authUserRoutes from "./routes/authUser.routes.js";
-import messageRoutes from "./routes/message.routes.js";
-import { verifyToken } from "../src/middleware/auth.js";
+import authUserRoutes from "./src/routes/authUser.routes.js";
+import messageRoutes from "./src/routes/message.routes.js";
+import { verifyToken } from "./src/middleware/auth.js";
 
 dotenv.config();
 
@@ -42,7 +42,7 @@ const io = new Server(server, {
   }
 });
 
-// Proses chat realtime Socket.IO
+// Proses menangani chat realtime Socket.IO
 const onlineUsers = new Map();
 
 io.on("connection", (socket) => {

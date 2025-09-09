@@ -18,7 +18,7 @@ export const verifyToken = (req, res, next) => {
   try {
     // Verifikasi token dengan acuan env
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
+    
     // Payload dari hasil jwt.verify 
     req.user = decoded;
 
