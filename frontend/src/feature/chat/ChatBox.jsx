@@ -1,6 +1,11 @@
-import BaseApi from "../../api/BaseApi";
 import { useEffect, useState } from "react";
-import socket from "../../socket";
+import socket from "../../socket.io/socket";
+import {
+  fetchMessages,
+  sendMessage,
+  updateMessage,
+  deleteMessage,
+} from "../../services/chatBoxService";
 
 const ChatBox = ({ partner }) => {
   const me = JSON.parse(localStorage.getItem("pengguna"));
@@ -8,18 +13,18 @@ const ChatBox = ({ partner }) => {
   const [messageInput, setMessageInput] = useState("");
   const [editingMessageId, setEditingMessageId] = useState(null);
 
-  // Fetch messages & setup socket listeners
   useEffect(() => {
     socket.emit("join", me.id);
 
     const loadMessages = async () => {
       try {
-        const response = await BaseApi.get(`/messages/${me.id}/${partner.id}`);
-        setMessages(response.data);
+        const data = await fetchMessages(me.id, partner.id);
+        setMessages(data);
       } catch (error) {
-        console.error("Failed to load messages:", error);
+        console.error("Gagal menunggu pesan:", error);
       }
     };
+
     loadMessages();
 
     const handleReceiveMessage = (msg) => {
@@ -46,7 +51,6 @@ const ChatBox = ({ partner }) => {
     socket.on("update_message", handleUpdateMessage);
     socket.on("delete_message", handleDeleteMessage);
 
-    // Cleanup listeners on unmount or partner change
     return () => {
       socket.off("receive_message", handleReceiveMessage);
       socket.off("update_message", handleUpdateMessage);
@@ -54,51 +58,43 @@ const ChatBox = ({ partner }) => {
     };
   }, [partner, me.id]);
 
-  // Send new message or update existing one
+
   const handleSendMessage = async () => {
     if (!messageInput.trim()) return;
 
     if (editingMessageId) {
       try {
-        const response = await BaseApi.put(`/messages/${editingMessageId}`, {
-          message: messageInput,
-        });
+        const updatedMsg = await updateMessage(editingMessageId, messageInput);
         setMessages((prev) =>
-          prev.map((msg) => (msg._id === editingMessageId ? response.data : msg))
+          prev.map((msg) => (msg._id === editingMessageId ? updatedMsg : msg))
         );
-        socket.emit("update_message", response.data);
+        socket.emit("update_message", updatedMsg);
         setEditingMessageId(null);
         setMessageInput("");
       } catch (error) {
-        console.error("Failed to update message:", error);
+        console.error("Gagal update pesan", error);
       }
       return;
     }
 
     try {
-      const response = await BaseApi.post("/messages", {
-        senderId: me.id,
-        receiverId: partner.id,
-        message: messageInput,
-      });
-      setMessages((prev) => [...prev, response.data]);
-      socket.emit("send_message", response.data);
+      const newMsg = await sendMessage(me.id, partner.id, messageInput);
+      setMessages((prev) => [...prev, newMsg]);
+      socket.emit("send_message", newMsg);
       setMessageInput("");
     } catch (error) {
-      console.error("Failed to send message:", error);
+      console.error("Gagal kirim pesan", error);
     }
   };
 
-  // Start editing a message
-  const startEditingMessage = (msg) => {
+  const handleStartEditingMessage = (msg) => {
     setEditingMessageId(msg._id);
     setMessageInput(msg.message);
   };
 
-  // Delete a message
   const handleDeleteMessage = async (messageId) => {
     try {
-      await BaseApi.delete(`/messages/${messageId}`);
+      await deleteMessage(messageId);
       setMessages((prev) =>
         prev.map((msg) =>
           msg._id === messageId ? { ...msg, message: "[Pesan dihapus]" } : msg
@@ -110,11 +106,10 @@ const ChatBox = ({ partner }) => {
         receiverId: partner.id,
       });
     } catch (error) {
-      console.error("Failed to delete message:", error);
+      console.error("Gagal hapus pesan", error);
     }
   };
 
-  // Logout user
   const handleLogout = () => {
     localStorage.removeItem("token_pengguna");
     localStorage.removeItem("pengguna");
@@ -122,57 +117,76 @@ const ChatBox = ({ partner }) => {
   };
 
   return (
-    <div className="flex flex-col h-screen">
-      <header className="p-4 border-b font-bold flex justify-between items-center">
-        <span>Chat dengan {partner.username}</span>
-        <button
-          onClick={handleLogout}
-          className="text-sm bg-red-500 text-white px-3 py-3 rounded hover:bg-red-600"
-        >
-          Keluar
-        </button>
-      </header>
+  <div className="flex flex-col h-screen bg-gray-100">
+    {/* Header */}
+    <header className="p-4 px-6 bg-white shadow flex justify-between items-center border-b">
+      <span className="text-lg font-semibold text-gray-800 truncate">
+        {partner.username}
+      </span>
+      <button
+        onClick={handleLogout}
+        className="text-sm text-red-500 hover:underline"
+      >
+        Keluar
+      </button>
+    </header>
 
-      <main className="flex-1 p-4 overflow-y-auto space-y-2">
-        {messages.map((msg, i) => (
-          <div
-            key={msg._id || i}
-            className={`p-2 rounded relative group ${
-              msg.senderId === me.id ? "bg-blue-200 text-right ml-auto" : "bg-gray-200"
-            } max-w-xs`}
-          >
-            <p>{msg.message}</p>
-            {msg.senderId === me.id && (
-              <div className="absolute top-0 right-0 p-1 text-xs hidden group-hover:flex space-x-1">
-                <button onClick={() => startEditingMessage(msg)}>✏️</button>
-                <button onClick={() => handleDeleteMessage(msg._id)}>🗑️</button>
-              </div>
-            )}
-          </div>
-        ))}
-      </main>
+    {/* Chat Messages */}
+    <main className="flex-1 overflow-y-auto px-4 py-3 space-y-2">
+      {messages.map((msg, i) => (
+       <div
+  key={msg._id || i}
+  className={`group relative max-w-xs md:max-w-md lg:max-w-lg break-words p-3 rounded-xl shadow-sm ${
+    msg.senderId === me.id
+      ? "ml-auto bg-blue-500 text-white"
+      : "mr-auto bg-white text-gray-800"
+  }`}
+>
+  <p>{msg.message}</p>
 
-      <footer className="p-4 flex border-t">
-        <input
-          className="flex-1 border p-2 rounded mr-2"
-          value={messageInput}
-          onChange={(e) => setMessageInput(e.target.value)}
-          placeholder="Tulis pesan..."
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              handleSendMessage();
-            }
-          }}
-        />
-        <button
-          onClick={handleSendMessage}
-          className="bg-blue-500 text-white px-4 py-2 rounded"
-        >
-          Kirim
-        </button>
-      </footer>
+  {/* Tombol Edit & Delete */}
+  {msg.senderId === me.id && (
+    <div className="absolute -top-2 -right-2 text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex space-x-1 bg-white rounded shadow p-1">
+      <button
+        onClick={() => handleStartEditingMessage(msg)}
+        className="hover:scale-110"
+      >
+        ✏️
+      </button>
+      <button
+        onClick={() => handleDeleteMessage(msg._id)}
+        className="hover:scale-110"
+      >
+        🗑️
+      </button>
     </div>
-  );
+  )}
+</div>
+
+      ))}
+    </main>
+
+    {/* Footer - Input Chat */}
+    <footer className="p-4 bg-white border-t shadow flex gap-2 items-center">
+      <input
+        className="flex-1 border border-gray-300 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        value={messageInput}
+        onChange={(e) => setMessageInput(e.target.value)}
+        placeholder="Tulis pesan..."
+        onKeyDown={(e) => {
+          if (e.key === "Enter") handleSendMessage();
+        }}
+      />
+      <button
+        onClick={handleSendMessage}
+        className="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition"
+      >
+        Kirim
+      </button>
+    </footer>
+  </div>
+);
+
 };
 
 export default ChatBox;

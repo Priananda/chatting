@@ -1,56 +1,38 @@
 import { useState } from "react";
-import BaseApi from "../../api/BaseApi";
+import { useDispatch, useSelector } from "react-redux";
+import { loginUser, clearMessages } from "../../store/authSlice";
 import Button from "../../components/Button";
 
 const Login = () => {
-  const [form, setForm] = useState({ email: "", password: "" });
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
+  const { error, loading } = useSelector((state) => state.auth);
 
-  const clickChange = e => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const [form, setForm] = useState({ 
+    email: "", 
+    password: "" });
+
+  const handleChange = (e) => {
+    dispatch(clearMessages());
+    setForm({ ...form, [[e.target.name]]: e.target.value });
   };
 
-  const loginSubmit = async e => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setError(null);
-    setLoading(true);
-
-    try {
-      const response = await BaseApi.post("/users/login", form);
-
-      const token = response.data.token;
-      const user = response.data.user;
-
-      localStorage.setItem("token_pengguna", token);
-      localStorage.setItem("pengguna", JSON.stringify({
-        id: user.id,
-        username: user.username,
-        email: user.email
-      }));
-
-
-      console.log("Login sukses:", response.data);
-    } catch (error) {
-      setError(error.response?.data?.message || "Terjadi kesalahan saat login");
-    } finally {
-      setLoading(false);
-    }
+    dispatch(loginUser(form));
   };
 
   return (
     <div className="max-w-md mx-auto mt-10 p-6 border rounded shadow">
       <h2 className="text-2xl font-bold mb-4">Login</h2>
-
       {error && <div className="mb-4 text-red-600">{error}</div>}
 
-      <form onSubmit={loginSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="email"
           name="email"
           placeholder="Email"
           value={form.email}
-          onChange={clickChange}
+          onChange={handleChange}
           className="w-full p-2 border rounded"
           required
         />
@@ -59,7 +41,7 @@ const Login = () => {
           name="password"
           placeholder="Kata Sandi"
           value={form.password}
-          onChange={clickChange}
+          onChange={handleChange}
           className="w-full p-2 border rounded"
           required
         />

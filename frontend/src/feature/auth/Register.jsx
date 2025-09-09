@@ -1,32 +1,30 @@
 import { useState } from "react";
-import BaseApi from "../../api/BaseApi";
+import { useDispatch, useSelector } from "react-redux";
+import { registerUser, clearMessages } from "../../store/authSlice";
 import Button from "../../components/Button";
 
 const Register = () => {
-  const [form, setForm] = useState({ username: "", email: "", password: "" });
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
+  const {success, loading, error } = useSelector((state) => state.auth);
 
-  const clickChange = e => {
+  const [form, setForm] = useState({ 
+    username: "", 
+    email: "", 
+    password: "" 
+  });
+
+  const handleChange = (e) => {
+    dispatch(clearMessages());
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const registerSubmit = async e => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setError(null);
-    setSuccess(null);
-    setLoading(true);
-
-    try {
-      const response = await BaseApi.post("/users/register", form);
-      setSuccess(response.data.message);
-      setForm({ username: "", email: "", password: "" });
-    } catch (error) {
-      setError(error.response?.data?.message || "Terjadi kesalahan saat register");
-    } finally {
-      setLoading(false);
-    }
+    dispatch(registerUser(form)).then((res) => {
+      if (res.meta.requestStatus === "fulfilled") {
+        setForm({ username: "", email: "", password: "" });
+      }
+    });
   };
 
   return (
@@ -36,13 +34,13 @@ const Register = () => {
       {error && <div className="mb-4 text-red-600">{error}</div>}
       {success && <div className="mb-4 text-green-600">{success}</div>}
 
-      <form onSubmit={registerSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="text"
           name="username"
           placeholder="Username"
           value={form.username}
-          onChange={ clickChange}
+          onChange={handleChange}
           className="w-full p-2 border rounded"
           required
         />
@@ -51,7 +49,7 @@ const Register = () => {
           name="email"
           placeholder="Email"
           value={form.email}
-          onChange={ clickChange}
+          onChange={handleChange}
           className="w-full p-2 border rounded"
           required
         />
@@ -60,7 +58,7 @@ const Register = () => {
           name="password"
           placeholder="Kata Sandi"
           value={form.password}
-          onChange={clickChange}
+          onChange={handleChange}
           className="w-full p-2 border rounded"
           required
         />

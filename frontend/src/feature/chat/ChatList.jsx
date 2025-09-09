@@ -9,27 +9,26 @@ const ChatList = ({ onSelect }) => {
     const fetchUsers = async () => {
       try {
         const response = await BaseApi.get("/users/list");
-        // Filter agar user sendiri tidak muncul di list
         const otherUsers = response.data.filter(user => user.id !== me.id);
         setUsers(otherUsers);
-      } catch (error) {
-        console.error("Gagal mengambil daftar pengguna:", error);
+      } catch (err) {
+        console.error("Gagal mengambil daftar pengguna pada list chat", err);
       }
     };
     fetchUsers();
   }, [me.id]);
 
   return (
-    <div className="p-4">
-      <h2 className="font-bold text-xl mb-4">Daftar Chat</h2>
+    <div className="p-5">
+      <h2 className="mb-3 font-bold text-lg">Daftar Chat</h2>
       {users.length === 0 ? (
-        <p>Tidak ada pengguna lain.</p>
+        <p>Tidak ada lawan chat.</p>
       ) : (
         users.map(user => (
           <div
             key={user.id}
             onClick={() => onSelect(user)}
-            className="cursor-pointer p-2 border-b hover:bg-gray-100"
+            className="cursor-pointer text-md  p-2 border-b border-gray-400 hover:bg-gray-100"
             role="button"
             tabIndex={0}
             onKeyDown={e => {
@@ -38,7 +37,7 @@ const ChatList = ({ onSelect }) => {
               }
             }}
           >
-            {user.username} ({user.email})
+            {user.username} 
           </div>
         ))
       )}

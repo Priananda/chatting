@@ -1,35 +1,19 @@
-// src/components/ProfileUser.jsx
-import React, { useEffect, useState } from "react";
-import BaseApi from "../../api/BaseApi"; // pastikan path sesuai
-
-// Fungsi getProfile API
-const getProfile = async () => {
-  const token = localStorage.getItem("token_pengguna");
-  if (!token) throw new Error("Token tidak ditemukan");
-
-  const response = await BaseApi.get("/users/me", {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  return response.data;
-};
+import { useEffect, useState } from "react";
+import userProfile from "../../services/profileService";
 
 const ProfileUser = () => {
-  const [user, setUser] = useState(null);     // Simpan data user
-  const [error, setError] = useState(null);   // Simpan error
-  const [loading, setLoading] = useState(true); // Loading state
+  const [user, setUser] = useState(null);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const profile = await getProfile();
-        setUser(profile);
-      } catch (_err) {
-  console.error(_err); // pakai supaya ESLint gak complain
-  setError("Gagal mengambil data profile");
-
+        const data = await userProfile();
+        setUser(data);
+      } catch (err) {
+        console.error(err);
+        setError("Gagal mengambil data profile");
       } finally {
         setLoading(false);
       }
@@ -43,22 +27,31 @@ const ProfileUser = () => {
   if (!user) return <p className="text-center mt-10">User tidak ditemukan</p>;
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 border rounded shadow">
-      <h2 className="text-2xl font-bold mb-4">Profil Pengguna</h2>
-      <div className="space-y-2">
-        <p>
-          <span className="font-semibold">Username:</span> {user.username}
-        </p>
-        <p>
-          <span className="font-semibold">Email:</span> {user.email}
-        </p>
-        <p>
-          <span className="font-semibold">Dibuat pada:</span>{" "}
-          {new Date(user.createdAt).toLocaleDateString()}
-        </p>
-      </div>
+  <div className="mt-2 p-5 flex items-center space-x-3">
+    <div className="w-10 h-10 flex items-center justify-center font-semibold bg-blue-200 text-gray-500 text-xl rounded-full">
+      {user.username.charAt(0).toUpperCase()}
     </div>
-  );
+    <h2 className="text-lg font-medium">{user.username}</h2>
+  </div>
+);
+
+  // return (
+  //   <div className="max-w-md mx-auto mt-10 p-6 border rounded shadow">
+  //     <h2 className="text-2xl font-bold mb-4">Profil Pengguna</h2>
+  //     <div className="space-y-2">
+  //       <p>
+  //         <span className="font-semibold">Username:</span> {user.username}
+  //       </p>
+  //       <p>
+  //         <span className="font-semibold">Email:</span> {user.email}
+  //       </p>
+  //       <p>
+  //         <span className="font-semibold">Dibuat pada:</span>{" "}
+  //         {new Date(user.createdAt).toLocaleDateString()}
+  //       </p>
+  //     </div>
+  //   </div>
+  // );
 };
 
 export default ProfileUser;
