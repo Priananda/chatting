@@ -117,28 +117,28 @@ const ChatBox = ({ partner }) => {
   };
 
   return (
-  <div className="flex flex-col h-screen bg-gray-100">
+  <div className="flex flex-col h-screen bg-blue-500/10">
     {/* Header */}
-    <header className="p-4 px-6 bg-white shadow flex justify-between items-center border-b">
-      <span className="text-lg font-semibold text-gray-800 truncate">
+    <header className="p-4 bg-white shadow flex justify-between items-center">
+      <span className="text-md font-semibold text-gray-800 ">
         {partner.username}
       </span>
       <button
         onClick={handleLogout}
-        className="text-sm text-red-500 hover:underline"
+        className="text-md text-red-500 hover:text-red-400 cursor-pointer"
       >
         Keluar
       </button>
     </header>
 
     {/* Chat Messages */}
-    <main className="flex-1 overflow-y-auto px-4 py-3 space-y-2">
+    <main className="flex-1 px-3 py-3 space-y-3 overflow-x-auto">
       {messages.map((msg, i) => (
        <div
   key={msg._id || i}
-  className={`group relative max-w-xs md:max-w-md lg:max-w-lg break-words p-3 rounded-xl shadow-sm ${
+  className={`group relative p-3 max-w-40 md:max-w-md lg:max-w-md break-words rounded-md shadow-md ${
     msg.senderId === me.id
-      ? "ml-auto bg-blue-500 text-white"
+      ? "ml-auto bg-blue-600 text-white"
       : "mr-auto bg-white text-gray-800"
   }`}
 >
@@ -146,16 +146,16 @@ const ChatBox = ({ partner }) => {
 
   {/* Tombol Edit & Delete */}
   {msg.senderId === me.id && (
-    <div className="absolute -top-2 -right-2 text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex space-x-1 bg-white rounded shadow p-1">
+    <div className="absolute flex p-1 space-x-1 -top-1 -right-1 text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded shadow bg-white">
       <button
         onClick={() => handleStartEditingMessage(msg)}
-        className="hover:scale-110"
+        className="cursor-pointer"
       >
         ✏️
       </button>
       <button
         onClick={() => handleDeleteMessage(msg._id)}
-        className="hover:scale-110"
+        className="cursor-pointer"
       >
         🗑️
       </button>
@@ -167,9 +167,9 @@ const ChatBox = ({ partner }) => {
     </main>
 
     {/* Footer - Input Chat */}
-    <footer className="p-4 bg-white border-t shadow flex gap-2 items-center">
+    <footer className="p-4 flex items-center gap-3 bg-white">
       <input
-        className="flex-1 border border-gray-300 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+        className="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none"
         value={messageInput}
         onChange={(e) => setMessageInput(e.target.value)}
         placeholder="Tulis pesan..."
@@ -179,7 +179,7 @@ const ChatBox = ({ partner }) => {
       />
       <button
         onClick={handleSendMessage}
-        className="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition"
+        className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-500 transition"
       >
         Kirim
       </button>

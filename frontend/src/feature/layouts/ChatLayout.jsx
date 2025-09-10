@@ -6,22 +6,22 @@ import ChatBox from "../chat/ChatBox";
 const ChatLayout = () => {
   const [selectedUser, setSelectedUser] = useState(null);
 return (
-  <div className="flex flex-col md:flex-row min-h-screen">
+  <div className="flex flex-col md:flex-row h-screen">
     {/* Sidebar kiri */}
-    <div className="w-full md:w-1/4 border-b md:border-b-0 md:border-r border-gray-300 flex flex-col">
+    <div className="w-full md:w-1/4 border-0 md:border-r border-gray-300 flex flex-col">
       {/* Profil akun sendiri */}
       <div>
         <ProfileUser />
       </div>
 
       {/* Daftar chat */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="">
         <ChatList onSelect={setSelectedUser} />
       </div>
     </div>
 
     {/* Area kanan - ChatBox */}
-    <div className="w-full md:flex-1 p-2 flex flex-col">
+    <div className="w-full flex flex-col">
       {selectedUser ? (
         <ChatBox partner={selectedUser} />
       ) : (

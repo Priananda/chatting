@@ -19,8 +19,8 @@ const ChatList = ({ onSelect }) => {
   }, [me.id]);
 
   return (
-    <div className="p-5">
-      <h2 className="mb-3 font-bold text-lg">Daftar Chat</h2>
+    <div className="p-4 mt-2">
+      <h2 className="mb-3 text-black font-bold text-lg">Daftar Chat</h2>
       {users.length === 0 ? (
         <p>Tidak ada lawan chat.</p>
       ) : (
@@ -28,7 +28,7 @@ const ChatList = ({ onSelect }) => {
           <div
             key={user.id}
             onClick={() => onSelect(user)}
-            className="cursor-pointer text-md  p-2 border-b border-gray-400 hover:bg-gray-100"
+            className="p-2 cursor-pointer text-black text-md border-b border-gray-300 hover:bg-blue-50"
             role="button"
             tabIndex={0}
             onKeyDown={e => {

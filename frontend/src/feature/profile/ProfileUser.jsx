@@ -27,11 +27,11 @@ const ProfileUser = () => {
   if (!user) return <p className="text-center mt-10">User tidak ditemukan</p>;
 
   return (
-  <div className="mt-2 p-5 flex items-center space-x-3">
-    <div className="w-10 h-10 flex items-center justify-center font-semibold bg-blue-200 text-gray-500 text-xl rounded-full">
+  <div className="p-4 mt-2 flex items-center space-x-3">
+    <div className="w-10 h-10 flex items-center justify-center font-semibold text-xl bg-blue-200 text-gray-500 rounded-full">
       {user.username.charAt(0).toUpperCase()}
     </div>
-    <h2 className="text-lg font-medium">{user.username}</h2>
+    <h2 className="text-lg text-black font-medium">{user.username}</h2>
   </div>
 );
 
