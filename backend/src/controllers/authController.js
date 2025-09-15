@@ -22,7 +22,7 @@ export const loginUser = async (req, res) => {
   }
 };
 
-// List-list Users
+// Daftar list users
 export const listUsers = async (req, res) => {
   try {
      const users = await authService.listAllUsers();

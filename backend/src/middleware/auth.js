@@ -2,15 +2,15 @@ import jwt from "jsonwebtoken";
 
 // Middleware untuk memverifikasi JWT
 export const verifyToken = (req, res, next) => {
-  const authHeader = req.headers["authorization"];
+  const header = req.headers["authorization"];
 
   // Proses mengecek
-  if (!authHeader) {
+  if (!header) {
     return res.status(401).json({ message: "Akses ditolak, header Authorization tidak ditemukan" });
   }
 
-  // Format Bearer  <token>
-  const [bearer, token] = authHeader.split(" ");
+  // Verifikasi format bearer <token>
+  const [bearer, token] = header.split(" ");
   if (bearer !== "Bearer" || !token) {
     return res.status(401).json({ message: "Format token salah atau gunakan bearer <token>" });
   }

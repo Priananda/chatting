@@ -24,9 +24,9 @@ app.use(express.json());
 
 // Middleware global
 app.use((req, res, next) => {
-  const publicPaths = ["/api/users/register", "/api/users/login"];
+  const paths = ["/api/users/register", "/api/users/login"];
   
-  if (publicPaths.includes(req.path)) return next();
+  if (paths.includes(req.path)) return next();
   verifyToken(req, res, next);
 });
 

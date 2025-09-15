@@ -49,7 +49,7 @@ export const login = async ({ email, password }) => {
   };
 };
 
-// Mengambil tiap-tiap users
+// Daftar list users
 export const listAllUsers = async () => {
   const users = await User.find().select("_id username email");
   return users.map(u => ({

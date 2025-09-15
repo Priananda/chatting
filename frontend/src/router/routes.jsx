@@ -8,7 +8,7 @@ const ProfileUser = lazy(() => import("../feature/profile/ProfileUser"));
 
 const AppRoutes = () => {
   return (
-    <Suspense fallback={<div>Loading..........</div>}>
+    <Suspense>
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />

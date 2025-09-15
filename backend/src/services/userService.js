@@ -1,5 +1,6 @@
 import User from "../models/authUser.js";
 
+// Profile
 // Get data user berdasarkan ID
 export const getUserProfile = async (userId) => {
   

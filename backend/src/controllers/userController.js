@@ -1,7 +1,7 @@
 import * as userService from "../services/userService.js";
 
-// MeData
-export const meData = async (req, res) => {
+// Profile
+export const profileUsers = async (req, res) => {
   try {
     const user = await userService.getUserProfile(req.user.id);
     res.json(user);

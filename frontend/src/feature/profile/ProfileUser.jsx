@@ -34,24 +34,6 @@ const ProfileUser = () => {
     <h2 className="text-lg text-black font-medium">{user.username}</h2>
   </div>
 );
-
-  // return (
-  //   <div className="max-w-md mx-auto mt-10 p-6 border rounded shadow">
-  //     <h2 className="text-2xl font-bold mb-4">Profil Pengguna</h2>
-  //     <div className="space-y-2">
-  //       <p>
-  //         <span className="font-semibold">Username:</span> {user.username}
-  //       </p>
-  //       <p>
-  //         <span className="font-semibold">Email:</span> {user.email}
-  //       </p>
-  //       <p>
-  //         <span className="font-semibold">Dibuat pada:</span>{" "}
-  //         {new Date(user.createdAt).toLocaleDateString()}
-  //       </p>
-  //     </div>
-  //   </div>
-  // );
 };
 
 export default ProfileUser;

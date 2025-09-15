@@ -1,5 +1,6 @@
 import * as messageService from "../services/messageService.js";
 
+// Create
 export const createMessage = async (req, res) => {
   try {
     const newMessage = await messageService.createMessage(req.body);
@@ -9,6 +10,7 @@ export const createMessage = async (req, res) => {
   }
 };
 
+// Read
 export const getMessages = async (req, res) => {
   try {
     const { user1, user2 } = req.params;
@@ -19,6 +21,7 @@ export const getMessages = async (req, res) => {
   }
 };
 
+// Update
 export const updateMessage = async (req, res) => {
   try {
     const { id } = req.params;
@@ -30,6 +33,7 @@ export const updateMessage = async (req, res) => {
   }
 };
 
+// Delete
 export const deleteMessage = async (req, res) => {
   try {
     const { id } = req.params;

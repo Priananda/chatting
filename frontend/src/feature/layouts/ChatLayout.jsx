@@ -5,34 +5,44 @@ import ChatBox from "../chat/ChatBox";
 
 const ChatLayout = () => {
   const [selectedUser, setSelectedUser] = useState(null);
-return (
-  <div className="flex flex-col md:flex-row h-screen">
-    {/* Sidebar kiri */}
-    <div className="w-full md:w-1/4 border-0 md:border-r border-gray-300 flex flex-col">
-      {/* Profil akun sendiri */}
-      <div>
-        <ProfileUser />
-      </div>
 
-      {/* Daftar chat */}
-      <div className="">
-        <ChatList onSelect={setSelectedUser} />
-      </div>
-    </div>
-
-    {/* Area kanan - ChatBox */}
-    <div className="w-full flex flex-col">
-      {selectedUser ? (
-        <ChatBox partner={selectedUser} />
-      ) : (
-        <div className="flex-1 flex items-center justify-center text-gray-500">
-          <p className="text-base md:text-lg">Pilih pengguna untuk memulai chat</p>
+  return (
+    <div className="flex h-screen relative overflow-hidden">
+      {/* Sidebar kiri - daftar chat + profil */}
+      <div
+        className={`absolute md:relative w-full md:w-1/4 h-full bg-white z-20 transition-transform duration-300 ease-in-out
+          ${selectedUser ? "-translate-x-full md:translate-x-0" : "translate-x-0"}
+        `}
+      >
+        <div>
+          <ProfileUser />
         </div>
-      )}
-    </div>
-  </div>
-);
+        <div>
+          <ChatList onSelect={setSelectedUser} />
+        </div>
+      </div>
 
+      {/* ChatBox area */}
+      <div
+        className={`absolute md:relative w-full md:w-3/4 h-full bg-white transition-transform duration-300 ease-in-out
+          ${selectedUser ? "translate-x-0" : "translate-x-full md:translate-x-0"}
+        `}
+      >
+        {selectedUser ? (
+          <ChatBox
+            partner={selectedUser}
+            onBack={() => setSelectedUser(null)}
+          />
+        ) : (
+          <div className="flex-1 flex items-center justify-center text-gray-500 h-full">
+            <p className="text-base md:text-lg">
+              Pilih pengguna untuk memulai chat
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default ChatLayout;
