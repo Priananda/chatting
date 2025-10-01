@@ -2,7 +2,7 @@ import User from "../models/authUser.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-// Registrasi: proses validasi
+// Registrasi
 export const register = async ({ username, email, password }) => {
   if (!username || !email || !password) {
     throw { status: 400, message: "Semua wajib diisi" };
@@ -18,14 +18,10 @@ export const register = async ({ username, email, password }) => {
   const newUser = new User({ username, email, password: hashedPassword });
   const savedUser = await newUser.save();
 
-  return {
-    id: savedUser._id,
-    username: savedUser.username,
-    email: savedUser.email,
-  };
+  return savedUser.toJSON();
 };
 
-// Login: proses validasi
+// Login
 export const login = async ({ email, password }) => {
   const user = await User.findOne({ email });
   if (!user) {
@@ -37,24 +33,16 @@ export const login = async ({ email, password }) => {
     throw { status: 401, message: "Password salah" };
   }
 
-  const token = jwt.sign({ id: user._id.toString() }, process.env.JWT_SECRET, { expiresIn: "1h" });
-  
+  const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+
   return {
     token,
-    user: {
-      id: user._id,
-      username: user.username,
-      email: user.email,
-    },
+    user: user.toJSON(),
   };
 };
 
-// Daftar list users
+// Daftar semua users
 export const listAllUsers = async () => {
-  const users = await User.find().select("_id username email");
-  return users.map(u => ({
-    id: u._id,
-    username: u.username,
-    email: u.email,
-  }));
+  const users = await User.find().select("username email");
+  return users.map(u => u.toJSON());
 };
