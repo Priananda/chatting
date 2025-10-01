@@ -9,5 +9,4 @@ COPY . .
 
 EXPOSE 8000
 
-# Jalankan aplikasi production
 CMD ["npm", "start"]

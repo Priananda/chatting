@@ -1,4 +1,3 @@
-# Gunakan Node.js LTS
 FROM node:18
 
 WORKDIR /app
@@ -10,5 +9,4 @@ COPY . .
 
 EXPOSE 8000
 
-# Jalankan backend dengan nodemon untuk hot reload
 CMD ["npx", "nodemon", "index.js"]
