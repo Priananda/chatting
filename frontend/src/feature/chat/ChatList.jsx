@@ -1,43 +1,74 @@
 import { useEffect, useState } from "react";
-import BaseApi from "../../api/BaseApi";  
+import { useSelector, useDispatch } from "react-redux";
+import { fetchFriends, addFriend, clearFriendMessage} from "../../store/friendSlice";
 
 const ChatList = ({ onSelect }) => {
-  const [users, setUsers] = useState([]);
-  const me = JSON.parse(localStorage.getItem("pengguna"));
+  const [friendInput, setFriendInput] = useState("");
+
+  const dispatch = useDispatch();
+  const { user, token } = useSelector((state) => state.auth);
+  const { list: friends, message} = useSelector((state) => state.friend);
+  
+  useEffect(() => {
+    if (user?.id) {
+      dispatch(fetchFriends(token));
+    }
+  }, [user, token, dispatch]);
+
+  const handleAddFriend = () => {
+    if (!friendInput.trim()) return;
+    dispatch(addFriend({ friendIdentifier: friendInput, token }))
+      .unwrap()
+      .then(() => {
+        dispatch(fetchFriends(token)); // refresh daftar teman
+        setFriendInput("");
+      });
+  };
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await BaseApi.get("/users/list");
-        const otherUsers = response.data.filter(user => user.id !== me.id);
-        setUsers(otherUsers);
-      } catch (err) {
-        console.error("Gagal mengambil daftar pengguna pada list chat", err);
-      }
-    };
-    fetchUsers();
-  }, [me.id]);
+  if (message) {
+    const timer = setTimeout(() => {
+      dispatch(clearFriendMessage());
+    }, 4000);
+
+    return () => clearTimeout(timer);
+  }
+}, [message, dispatch]);
+
 
   return (
     <div className="p-4 mt-2">
-      <h2 className="mb-3 text-black font-bold text-lg">Daftar Chat</h2>
-      {users.length === 0 ? (
-        <p>Tidak ada lawan chat.</p>
+      <h2 className="mb-5 text-black font-bold text-lg">Daftar Chat</h2>
+
+      <div className="mb-3 flex items-center">
+        <input
+          type="text"
+          value={friendInput}
+          onChange={(e) => setFriendInput(e.target.value)}
+          placeholder="Username / Email"
+          className="flex-1 p-2 placeholder:text-md placeholder:text-gray-500  border border-gray-300  focus:outline-none rounded-md mr-2 "
+        />
+        <button
+          onClick={handleAddFriend}
+          className="bg-blue-600 text-md px-3 py-2 text-white rounded-md"
+        >
+          +
+        </button>
+      </div>
+
+{message && <p className="text-sm text-green-600 mb-2">{message}</p>}
+  
+      {friends.length === 0 ? (
+        <p className="text-gray-500">Belum ada teman.</p>
       ) : (
-        users.map(user => (
+        friends.map((friend) => (
           <div
-            key={user.id}
-            onClick={() => onSelect(user)}
+            key={friend.id}
+            onClick={() => onSelect(friend)}
             className="p-2 cursor-pointer text-black text-md border-b border-gray-300 hover:bg-blue-50"
-            role="button"
-            tabIndex={0}
-            onKeyDown={e => {
-              if (e.key === "Enter" || e.key === " ") {
-                onSelect(user);
-              }
-            }}
           >
-            {user.username} 
+            {friend.username} 
+            {/* ({friend.email}) */}
           </div>
         ))
       )}

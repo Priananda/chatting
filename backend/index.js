@@ -7,6 +7,7 @@ import cors from "cors";
 
 import authUserRoutes from "./src/routes/authUser.routes.js";
 import messageRoutes from "./src/routes/message.routes.js";
+import friendRoutes from "./src/routes/friend.routes.js";
 import { verifyToken } from "./src/middleware/auth.js";
 
 dotenv.config();
@@ -33,6 +34,7 @@ app.use((req, res, next) => {
 // Pasang router yang saling terkait
 app.use("/api/users", authUserRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/friend", friendRoutes);
 
 // CORS real-time
 const io = new Server(server, {

@@ -1,0 +1,17 @@
+# Gunakan image berbasis Linux (bukan Alpine)
+FROM node:18-bullseye
+
+# Atur working directory
+WORKDIR /app
+
+# Hanya salin file dependency dulu (biar cache efisien)
+COPY package*.json ./
+
+# Install dependency di dalam Docker (bukan dari Windows)
+RUN npm install && npm rebuild
+
+# Lalu salin semua file project (kecuali node_modules)
+COPY . .
+
+# Jalankan Vite dev server
+CMD ["npm", "run", "dev"]

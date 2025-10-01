@@ -4,7 +4,6 @@ import userProfile from "../../services/profileService";
 const ProfileUser = () => {
   const [user, setUser] = useState(null);
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -14,15 +13,12 @@ const ProfileUser = () => {
       } catch (err) {
         console.error(err);
         setError("Gagal mengambil data profile");
-      } finally {
-        setLoading(false);
-      }
+      } 
     };
 
     fetchProfile();
   }, []);
 
-  if (loading) return <p className="text-center mt-10">Loading...</p>;
   if (error) return <p className="text-center mt-10 text-red-500">{error}</p>;
   if (!user) return <p className="text-center mt-10">User tidak ditemukan</p>;
 
